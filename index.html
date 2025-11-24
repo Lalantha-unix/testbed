@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CITES – Meeting Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card-bg: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text: #f9fafb;
+      --text-soft: #9ca3af;
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --chip-bg: rgba(15, 23, 42, 0.8);
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.8);
+      --radius-xl: 1.5rem;
+      --radius-lg: 1rem;
+      --radius-md: 0.75rem;
+      --transition-fast: 150ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #020617 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.95));
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 24px 24px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      inset: -80px;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.32), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(22, 163, 74, 0.25), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .header-inner {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-main {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .logo-circle {
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.9));
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.95), 0 12px 30px rgba(0, 0, 0, 0.8);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .header-text h1 {
+      font-size: clamp(1.5rem, 2vw, 1.9rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .header-text h1 span {
+      opacity: 0.6;
+      font-weight: 400;
+    }
+
+    .header-subtitle {
+      margin-top: 4px;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      backdrop-filter: blur(14px);
+    }
+
+    .meta-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 8px 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #15803d);
+      color: #022c22;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.55);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 20px 40px rgba(22, 163, 74, 0.65);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-soft);
+      font-weight: 500;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(148, 163, 184, 0.9);
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 6px 2px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      padding: 2px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border-soft);
+      backdrop-filter: blur(18px);
+      gap: 3px;
+    }
+
+    .tab {
+      border-radius: 999px;
+      padding: 5px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .tab.is-active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select {
+      position: relative;
+      min-width: 150px;
+    }
+
+    .select select {
+      width: 100%;
+      border-radius: 999px;
+      padding: 7px 32px 7px 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .select::after {
+      content: "▾";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-52%);
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      pointer-events: none;
+    }
+
+    .search-input {
+      position: relative;
+      min-width: 180px;
+      max-width: 230px;
+    }
+
+    .search-input input {
+      width: 100%;
+      border-radius: 999px;
+      padding: 7px 12px 7px 30px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      outline: none;
+    }
+
+    .search-input span {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-52%);
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    /* Schedule */
+    .schedule {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-soft);
+      padding: 18px 16px 18px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(26px);
+    }
+
+    .schedule-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-header-main h2 {
+      font-size: 1rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #d1d5db;
+      font-weight: 600;
+    }
+
+    .schedule-header-main p {
+      margin-top: 2px;
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+
+    .schedule-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .legend-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .legend-badge--plenary { background: #f97316; }
+    .legend-badge--committee { background: #22c55e; }
+    .legend-badge--sideevent { background: #38bdf8; }
+
+    .schedule-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 2.4fr) minmax(0, 1.5fr);
+      font-size: 0.8rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      overflow: hidden;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.98));
+    }
+
+    .schedule-row {
+      display: contents;
+    }
+
+    .schedule-cell {
+      padding: 10px 12px;
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      border-right: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+    }
+
+    .schedule-row:first-child .schedule-cell {
+      border-top: none;
+    }
+
+    .schedule-cell:last-child {
+      border-right: none;
+    }
+
+    .schedule-cell--head {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      background: rgba(17, 24, 39, 0.98);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .slot-time {
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .slot-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .slot-type--plenary {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      color: #fed7aa;
+    }
+
+    .slot-type--committee {
+      background: rgba(22, 163, 74, 0.07);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #bbf7d0;
+    }
+
+    .slot-type--sideevent {
+      background: rgba(56, 189, 248, 0.09);
+      border: 1px solid rgba(56, 189, 248, 0.65);
+      color: #bae6fd;
+    }
+
+    .slot-title {
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .slot-meta {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .slot-meta span + span::before {
+      content: "•";
+      opacity: 0.55;
+      margin-inline: 6px;
+    }
+
+    .slot-room {
+      font-weight: 500;
+      color: #d1fae5;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.7);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 14px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      opacity: 0.85;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 18px 16px 14px;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+      }
+
+      .schedule-grid {
+        display: block;
+      }
+
+      .schedule-row,
+      .schedule-cell {
+        display: block;
+      }
+
+      .schedule-cell--head {
+        position: static;
+        border-top: none;
+        border-right: none;
+      }
+
+      .schedule-cell + .schedule-cell {
+        border-top: 1px solid rgba(31, 41, 55, 0.9);
+      }
+
+      .schedule-cell {
+        border-right: none;
+      }
+
+      .slot-title {
+        font-size: 0.84rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filters {
+        width: 100%;
+      }
+
+      .search-input,
+      .select {
+        flex: 1;
+        max-width: 100%;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-main">
+          <div class="logo-circle">
+            CITES
+          </div>
+          <div class="header-text">
+            <h1>
+              CITES CoP<span>20</span>
+            </h1>
+            <div class="header-subtitle">
+              Conference of the Parties &mdash; Programme & Schedule
+            </div>
+            <div class="meta-row">
+              <div class="meta-chip">
+                <span class="meta-dot"></span>
+                <span>Draft schedule &mdash; for internal use</span>
+              </div>
+              <div class="meta-chip">
+                <span>Location: Samarkand, Uzbekistan</span>
+              </div>
+              <div class="meta-chip">
+                <span>Dates: 23 Nov &ndash; 3 Dec 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-primary" type="button">
+            <span class="btn-icon">⬇</span>
+            Export PDF (placeholder)
+          </button>
+          <button class="btn-ghost" type="button">
+            <span class="btn-icon">📅</span>
+            Today’s programme
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTROLS -->
+    <section class="controls" aria-label="Schedule filters">
+      <div class="tabs" id="dayTabs">
+        <button class="tab is-active" data-day="day1">Day 1</button>
+        <button class="tab" data-day="day2">Day 2</button>
+        <button class="tab" data-day="day3">Day 3</button>
+      </div>
+
+      <div class="filters">
+        <div class="select">
+          <select id="trackFilter" aria-label="Filter by session type">
+            <option value="all">All types</option>
+            <option value="plenary">Plenary</option>
+            <option value="committee">Committee</option>
+            <option value="sideevent">Side events</option>
+          </select>
+        </div>
+        <div class="search-input">
+          <span>🔍</span>
+          <input id="searchInput" type="text" placeholder="Search agenda…" />
+        </div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <main class="schedule" id="schedule" aria-label="CITES programme">
+      <div class="schedule-header">
+        <div class="schedule-header-main">
+          <h2 id="scheduleTitle">Day 1 &mdash; Opening</h2>
+          <p id="scheduleSubtitle">Sunday, 23 November 2025</p>
+        </div>
+        <div class="schedule-legend" aria-hidden="true">
+          <div class="legend-item">
+            <span class="legend-badge legend-badge--plenary"></span>
+            Plenary
+          </div>
+          <div class="legend-item">
+            <span class="legend-badge legend-badge--committee"></span>
+            Committee
+          </div>
+          <div class="legend-item">
+            <span class="legend-badge legend-badge--sideevent"></span>
+            Side event
+          </div>
+        </div>
+      </div>
+
+      <div id="scheduleGridContainer"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        No sessions match your filters. Try changing the day, type, or search text.
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>Draft example &mdash; replace with official CITES / Secretariat footer text.</span>
+      <span>Contact: <a href="mailto:secretariat@example.org">secretariat@example.org</a></span>
+    </footer>
+  </div>
+
+  <script>
+    // -----------------------------
+    // Simple schedule data example
+    // Replace / extend this with your real sessions
+    // -----------------------------
+    const scheduleData = {
+      day1: {
+        title: "Day 1 — Opening",
+        subtitle: "Sunday, 23 November 2025",
+        slots: [
+          {
+            time: "08:00–09:00",
+            type: "sideevent",
+            title: "Registration & badge collection",
+            chair: "Conference Services",
+            room: "Registration Area",
+            notes: "Participants are invited to arrive early to avoid queues."
+          },
+          {
+            time: "10:00–13:00",
+            type: "plenary",
+            title: "Opening of the meeting & adoption of the agenda",
+            chair: "CoP Chair",
+            room: "Plenary Hall",
+            notes: "High-level statements by Parties and observers."
+          },
+          {
+            time: "15:00–18:00",
+            type: "committee",
+            title: "Committee I: Strategic matters",
+            chair: "Committee I Chair",
+            room: "Room A",
+            notes: "Includes review of strategic vision and work programme."
+          },
+          {
+            time: "18:15–19:45",
+            type: "sideevent",
+            title: "Reception hosted by the Host Country",
+            chair: "Host Country",
+            room: "Networking Area",
+            notes: "All registered participants are invited."
+          }
+        ]
+      },
+      day2: {
+        title: "Day 2 — Committees",
+        subtitle: "Monday, 24 November 2025",
+        slots: [
+          {
+            time: "09:30–12:30",
+            type: "committee",
+            title: "Committee II: Financial and administrative matters",
+            chair: "Committee II Chair",
+            room: "Room B",
+            notes: "Budget, staffing and administrative arrangements."
+          },
+          {
+            time: "14:30–17:30",
+            type: "committee",
+            title: "Committee I: Species-specific proposals",
+            chair: "Committee I Chair",
+            room: "Room A",
+            notes: "Consideration of listing proposals."
+          },
+          {
+            time: "18:00–19:30",
+            type: "sideevent",
+            title: "Side event: Combating illegal wildlife trade",
+            chair: "Partner organizations",
+            room: "Side-event Room 1",
+            notes: "Panel discussion followed by Q&A."
+          }
+        ]
+      },
+      day3: {
+        title: "Day 3 — High-level segment",
+        subtitle: "Tuesday, 25 November 2025",
+        slots: [
+          {
+            time: "10:00–13:00",
+            type: "plenary",
+            title: "High-level segment: Ministerial roundtable",
+            chair: "CoP President",
+            room: "Plenary Hall",
+            notes: "Statements by ministers and heads of delegation."
+          },
+          {
+            time: "15:00–18:00",
+            type: "plenary",
+            title: "Plenary: Review of committee recommendations",
+            chair: "CoP President",
+            room: "Plenary Hall",
+            notes: "Includes adoption of selected decisions."
+          }
+        ]
+      }
+    };
+
+    const scheduleGridContainer = document.getElementById("scheduleGridContainer");
+    const emptyState = document.getElementById("emptyState");
+    const scheduleTitle = document.getElementById("scheduleTitle");
+    const scheduleSubtitle = document.getElementById("scheduleSubtitle");
+
+    const dayTabs = document.querySelectorAll("#dayTabs .tab");
+    const trackFilter = document.getElementById("trackFilter");
+    const searchInput = document.getElementById("searchInput");
+
+    let currentDayKey = "day1";
+
+    function renderSchedule() {
+      const day = scheduleData[currentDayKey];
+      if (!day) return;
+
+      scheduleTitle.innerHTML = day.title;
+      scheduleSubtitle.textContent = day.subtitle;
+
+      const searchText = (searchInput.value || "").toLowerCase().trim();
+      const track = trackFilter.value;
+
+      // Filter slots
+      let slots = day.slots || [];
+      slots = slots.filter(slot => {
+        const matchesTrack = track === "all" || slot.type === track;
+        const matchesText =
+          !searchText ||
+          slot.title.toLowerCase().includes(searchText) ||
+          (slot.notes && slot.notes.toLowerCase().includes(searchText)) ||
+          (slot.room && slot.room.toLowerCase().includes(searchText));
+        return matchesTrack && matchesText;
+      });
+
+      if (slots.length === 0) {
+        scheduleGridContainer.innerHTML = "";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      const grid = document.createElement("div");
+      grid.className = "schedule-grid";
+
+      // Header row
+      const headerRow = document.createElement("div");
+      headerRow.className = "schedule-row";
+      headerRow.innerHTML = `
+        <div class="schedule-cell schedule-cell--head">Time</div>
+        <div class="schedule-cell schedule-cell--head">Session</div>
+        <div class="schedule-cell schedule-cell--head">Room / Notes</div>
+      `;
+      grid.appendChild(headerRow);
+
+      // Data rows
+      slots.forEach(slot => {
+        const row = document.createElement("div");
+        row.className = "schedule-row";
+        row.setAttribute("data-type", slot.type);
+
+        // Time cell
+        const timeCell = document.createElement("div");
+        timeCell.className = "schedule-cell";
+        timeCell.innerHTML = `
+          <div class="slot-time">${slot.time}</div>
+        `;
+
+        // Session cell
+        const sessionCell = document.createElement("div");
+        sessionCell.className = "schedule-cell";
+        const typeClass =
+          slot.type === "plenary"
+            ? "slot-type--plenary"
+            : slot.type === "committee"
+            ? "slot-type--committee"
+            : "slot-type--sideevent";
+
+        sessionCell.innerHTML = `
+          <div class="slot-type ${typeClass}">
+            <span class="badge-dot"></span>
+            <span>${slot.type === "plenary" ? "Plenary" : slot.type === "committee" ? "Committee" : "Side event"}</span>
+          </div>
+          <div class="slot-title">${slot.title}</div>
+          <div class="slot-meta">
+            <span>${slot.chair || "Chair TBC"}</span>
+          </div>
+        `;
+
+        // Room cell
+        const roomCell = document.createElement("div");
+        roomCell.className = "schedule-cell";
+        roomCell.innerHTML = `
+          <div class="slot-room">${slot.room || "Room TBC"}</div>
+          ${slot.notes ? `<div class="slot-meta">${slot.notes}</div>` : ""}
+        `;
+
+        row.appendChild(timeCell);
+        row.appendChild(sessionCell);
+        row.appendChild(roomCell);
+        grid.appendChild(row);
+      });
+
+      scheduleGridContainer.innerHTML = "";
+      scheduleGridContainer.appendChild(grid);
+    }
+
+    // Tab click
+    dayTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        dayTabs.forEach(t => t.classList.remove("is-active"));
+        tab.classList.add("is-active");
+        currentDayKey = tab.getAttribute("data-day");
+        renderSchedule();
+      });
+    });
+
+    // Filters
+    trackFilter.addEventListener("change", renderSchedule);
+    searchInput.addEventListener("input", renderSchedule);
+
+    // Initial render
+    renderSchedule();
+  </script>
+</body>
+</html>
