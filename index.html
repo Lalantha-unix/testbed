@@ -89,44 +89,21 @@
       align-items: center;
     }
 
-    /* circular logo image 
+    /* header logo – keep original shape */
     .logo-image {
-      width: 64px;
-      height: 64px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 12px 30px rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    } 
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      overflow: visible;
+    }
 
     .logo-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 999px;
-    }*/
-/* square logo image */
-/* header logo – keep original shape */
-.logo-image {
-  /* no fixed square box */
-  width: auto;
-  height: auto;
-  border-radius: 0;
-  overflow: visible;
-}
-
-.logo-image img {
-  height: 56px;          /* adjust this to make it bigger/smaller */
-  width: auto;           /* keep original aspect ratio */
-  object-fit: contain;
-  border-radius: 0;      /* no rounding */
-  display: block;
-}
-}
+      height: 56px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 0;
+      display: block;
+    }
 
     .header-text h1 {
       font-size: clamp(1.5rem, 2vw, 1.9rem);
@@ -696,7 +673,7 @@
       <div class="header-inner">
         <div class="header-main">
           <div class="logo-image">
-            <img src="UZ_CoP20_logo_FINAL_0.jpg" alt="CITES 50 Logo">
+            <img src="UZ_CoP20_logo_FINAL_0.jpg" alt="CITES CoP20 Logo">
           </div>
           <div class="header-text">
             <h1>CITES CoP<span>20</span></h1>
@@ -706,23 +683,18 @@
             <div class="meta-row">
               <div class="meta-chip">
                 <span class="meta-dot"></span>
-                <!--<span>Side events — SL1</span>-->
               </div>
               <div class="meta-chip">
                 <span>Location: Samarkand, Uzbekistan</span>
               </div>
               <div class="meta-chip">
-                <span>Today: Saturday, 29 November 2025</span>
+                <span id="todayChip">Today: Saturday, 29 November 2025</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="header-actions">
-        <!--  <button class="btn-primary" type="button">
-            <span class="btn-icon">⬇</span>
-            Export PDF (placeholder)
-          </button> -->
           <button class="btn-ghost" type="button" id="todayBtn">
             <span class="btn-icon">📅</span>
             Today’s programme
@@ -817,8 +789,33 @@
   </div>
 
   <script>
-    // All SL1 items for 29 Nov 2025
-    const scheduleToday = [
+    // ---------- 1. AUTO DATE TEXT ----------
+    (function setTodayTexts() {
+      const now = new Date();
+      const options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      };
+      const formatted = now.toLocaleDateString("en-GB", options);
+
+      const todayChip = document.getElementById("todayChip");
+      const subtitle = document.getElementById("scheduleSubtitle");
+
+      if (todayChip) {
+        todayChip.textContent = `Today: ${formatted}`;
+      }
+      if (subtitle) {
+        subtitle.textContent = formatted;
+      }
+    })();
+
+    // ---------- 2. SCHEDULE DATA ----------
+    let scheduleToday = [];
+
+    // Fallback: your current schedule for 29 Nov
+    const fallbackSchedule = [
       {
         time: "07:00–09:00",
         type: "committee",
@@ -1075,7 +1072,7 @@
     const searchInput = document.getElementById("searchInput");
     const todayBtn = document.getElementById("todayBtn");
 
-    // ===== TIME PARSING & FLAGS (current / next) =====
+    // ---------- 3. TIME PARSING ----------
     function parseTimeRange(range) {
       if (!range) {
         return { start: 0, end: 24 * 60 };
@@ -1096,9 +1093,8 @@
       const start = parsePart(parts[0]);
       let end = parsePart(parts[1]);
 
-      // Avoid zero-length or negative intervals
       if (!Number.isFinite(end) || end <= start) {
-        end = start + 30; // default 30 minutes
+        end = start + 30;
       }
       return { start, end };
     }
@@ -1108,21 +1104,21 @@
       return now.getHours() * 60 + now.getMinutes();
     }
 
-    // Precompute times
-    scheduleToday.forEach(slot => {
-      const { start, end } = parseTimeRange(slot.time);
-      slot.startMinutes = start;
-      slot.endMinutes = end;
-    });
+    function precomputeTimes() {
+      scheduleToday.forEach(slot => {
+        const { start, end } = parseTimeRange(slot.time);
+        slot.startMinutes = start;
+        slot.endMinutes = end;
+      });
+    }
 
-    // ===== FILTER + TIME-BASED VIEW (hide past) =====
+    // ---------- 4. FILTER + HIDE PAST ----------
     function getFilteredSlots() {
       const searchText = (searchInput.value || "").toLowerCase().trim();
       const track = trackFilter.value;
       const nowMinutes = getNowMinutes();
 
       let slots = scheduleToday.filter(slot => {
-        // Hide past items: end time before "now"
         const isFutureOrCurrent = slot.endMinutes >= nowMinutes;
 
         const matchesTrack = track === "all" || slot.type === track;
@@ -1137,16 +1133,13 @@
         return isFutureOrCurrent && matchesTrack && matchesText;
       });
 
-      // Sort by start time
       slots.sort((a, b) => a.startMinutes - b.startMinutes);
 
-      // Reset flags
       slots.forEach(s => {
         s._isCurrent = false;
         s._isNext = false;
       });
 
-      // Mark current and next
       const now = nowMinutes;
       let currentIdx = -1;
       let nextIdx = -1;
@@ -1184,11 +1177,11 @@
       return { slots, currentIdx, nextIdx };
     }
 
-    // ===== PAGING / SLIDES =====
+    // ---------- 5. PAGING / SLIDES ----------
     let currentPage = 0;
-    const pageSize = 9; // max items per slide
+    const pageSize = 9;      // change this if you want more/less items per slide
     let autoRotateId = null;
-    const autoRotateMs = 20000; // 20 seconds per slide
+    const autoRotateMs = 20000;
 
     function renderSchedule(page = 0) {
       const { slots } = getFilteredSlots();
@@ -1308,7 +1301,39 @@
       }, autoRotateMs);
     }
 
-    // EVENTS
+    // ---------- 6. LOAD DATA FROM sl1.cop20.live ----------
+    async function loadSchedule() {
+      try {
+        // 👉 You must expose a schedule.json (or similar) from sl1.cop20.live
+        const res = await fetch("https://sl1.cop20.live/schedule.json");
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+
+        // Expect: [{ time, type, title, description, room, date }, ...]
+        scheduleToday = data.map(item => ({
+          time: item.time,
+          type: (item.type || "sideevent").toLowerCase(),
+          title: item.title,
+          chair: item.description || item.chair || "",
+          room: item.room || "",
+          notes: item.notes || ""
+        }));
+
+        precomputeTimes();
+        renderSchedule(0);
+        resetAutoRotate();
+      } catch (err) {
+        console.error("Failed to load schedule from sl1.cop20.live, using fallback:", err);
+        scheduleToday = fallbackSchedule.slice();
+        precomputeTimes();
+        renderSchedule(0);
+        resetAutoRotate();
+      }
+    }
+
+    // ---------- 7. EVENTS ----------
     trackFilter.addEventListener("change", () => {
       currentPage = 0;
       renderSchedule(currentPage);
@@ -1322,7 +1347,6 @@
     });
 
     todayBtn.addEventListener("click", () => {
-      // Reset filters to full "today" view
       trackFilter.value = "all";
       searchInput.value = "";
       currentPage = 0;
@@ -1330,17 +1354,8 @@
       resetAutoRotate();
     });
 
-    // INITIAL RENDER
-    renderSchedule(0);
-    resetAutoRotate();
+    // ---------- 8. INITIAL LOAD ----------
+    loadSchedule();
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
