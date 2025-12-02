@@ -1313,6 +1313,26 @@
       }, autoRotateMs);
     }
 
+	  // ---------- LIVE CLOCK ----------
+		(function startLiveClock() {
+		  const clockSpan = document.getElementById("liveClockText");
+		  if (!clockSpan) return;
+		
+		  function updateClock() {
+		    const now = new Date();
+		    const timeString = now.toLocaleTimeString("en-GB", {
+		      hour: "2-digit",
+		      minute: "2-digit",
+		      second: "2-digit"
+		    });
+		    clockSpan.textContent = timeString;
+		  }
+		
+		  updateClock();            // set immediately
+		  setInterval(updateClock, 1000);  // update every second
+		})();
+
+
     // ---------- 6. LOAD DATA FROM sl1.cop20.live ----------
     async function loadSchedule() {
       try {
@@ -1371,4 +1391,5 @@
   </script>
 </body>
 </html>
+
 
