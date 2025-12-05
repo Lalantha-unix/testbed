@@ -141,6 +141,7 @@
       font-size: 0.78rem;
       color: var(--text-soft);
       backdrop-filter: blur(14px);
+      white-space: nowrap;
     }
 
     .meta-dot {
@@ -183,26 +184,6 @@
     }
 
     .clock-label {
-      font-weight: 600;
-      color: #ffffff;
-    }
-
-    /* NEXT REFRESH TIMER */
-    .next-refresh {
-      border-radius: 999px;
-      padding: 6px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-soft);
-      font-size: 0.78rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      backdrop-filter: blur(20px);
-      white-space: nowrap;
-    }
-
-    .next-refresh-label {
       font-weight: 600;
       color: #ffffff;
     }
@@ -745,6 +726,10 @@
               <div class="meta-chip">
                 <span id="todayChip">Today: Saturday, 29 November 2025</span>
               </div>
+              <!-- REFRESH INFO CHIP -->
+              <div class="meta-chip" id="refreshChip">
+                Last refresh: --:-- • Next: --:--
+              </div>
             </div>
           </div>
         </div>
@@ -755,12 +740,6 @@
             <span class="clock-label">Current time:</span>
             <span id="liveClockText">--:--:--</span>
           </div>
-
-          <div class="next-refresh">
-            <span class="next-refresh-label">Next refresh:</span>
-            <span id="nextRefreshText">--:--:--</span>
-          </div>
-
           <button class="btn-ghost" type="button" id="todayBtn">
             <span class="btn-icon">📅</span>
             Today’s programme
@@ -855,6 +834,8 @@
   </div>
 
   <script>
+    const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
     // ---------- 1. AUTO DATE TEXT ----------
     (function setTodayTexts() {
       const now = new Date();
@@ -896,35 +877,33 @@
       setInterval(updateClock, 1000);
     })();
 
-    // ---------- 1c. AUTO REFRESH EVERY 10 MIN ----------
-    const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
-    let nextRefreshTime = null;
-
-    function updateNextRefreshDisplay() {
-      const el = document.getElementById("nextRefreshText");
-      if (!el || !nextRefreshTime) return;
-      el.textContent = nextRefreshTime.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
-    }
-
-    function scheduleAutoRefresh() {
+    // ---------- 1c. REFRESH INFO + AUTO RELOAD ----------
+    (function setupAutoRefresh() {
+      const refreshChip = document.getElementById("refreshChip");
       const now = new Date();
-      nextRefreshTime = new Date(now.getTime() + REFRESH_INTERVAL_MS);
-      updateNextRefreshDisplay();
+      const next = new Date(now.getTime() + REFRESH_INTERVAL_MS);
 
+      function fmt(t) {
+        return t.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      }
+
+      if (refreshChip) {
+        refreshChip.textContent = `Last refresh: ${fmt(now)} • Next: ${fmt(next)}`;
+      }
+
+      // schedule page reload
       setTimeout(() => {
-        loadSchedule();
-        scheduleAutoRefresh();
+        window.location.reload();
       }, REFRESH_INTERVAL_MS);
-    }
+    })();
 
     // ---------- 2. SCHEDULE DATA ----------
     let scheduleToday = [];
 
-    // Fallback: your current schedule for 29 Nov
+    // Fallback schedule (used only if fetch fails)
     const fallbackSchedule = [
       {
         time: "07:00–09:00",
@@ -1414,14 +1393,14 @@
     // ---------- 6. LOAD DATA FROM sl1.cop20.live ----------
     async function loadSchedule() {
       try {
-        // 👉 You must expose a schedule.json (or similar) from sl1.cop20.live
+        // You must expose schedule.json from sl1.cop20.live
         const res = await fetch("https://sl1.cop20.live/schedule.json");
         if (!res.ok) {
           throw new Error("HTTP " + res.status);
         }
         const data = await res.json();
 
-        // Expect: [{ time, type, title, description, room, date }, ...]
+        // Expect: [{ time, type, title, description, room, notes }, ...]
         scheduleToday = data.map(item => ({
           time: item.time,
           type: (item.type || "sideevent").toLowerCase(),
@@ -1466,8 +1445,6 @@
 
     // ---------- 8. INITIAL LOAD ----------
     loadSchedule();
-    scheduleAutoRefresh();
   </script>
 </body>
 </html>
-
